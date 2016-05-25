@@ -10,11 +10,14 @@ INCLUDES = -Ihl2sdk-csgo/public -Ihl2sdk-csgo/public/engine -Ihl2sdk-csgo/public
 
 all: affesay.so
 
-affesay.so: affesay.o netmessages.pb.o cstrike15_usermessages.pb.o libtier0.so hl2sdk-csgo/lib/linux/tier1_i486.a hl2sdk-csgo/lib/linux/interfaces_i486.a
+affesay.so: affesay.o recipientfilters.o netmessages.pb.o cstrike15_usermessages.pb.o libtier0.so hl2sdk-csgo/lib/linux/tier1_i486.a hl2sdk-csgo/lib/linux/interfaces_i486.a
 	$(GCC) $^ $(OPTIONS) -static-libgcc -lstdc++ $(shell pkg-config --cflags --libs protobuf) -shared -o affesay.so
 
 affesay.o: affesay.cpp netmessages.pb.h cstrike15_usermessages.pb.h
 	$(GCC) affesay.cpp $(WARNINGS) $(OPTIONS) $(FLAGS) $(EXTRA_FLAGS) $(DEFINES) $(INCLUDES) -c -o affesay.o
+
+recipientfilters.o: recipientfilters.cpp
+	$(GCC) recipientfilters.cpp $(WARNINGS) $(OPTIONS) $(FLAGS) $(EXTRA_FLAGS) $(DEFINES) $(INCLUDES) -c -o recipientfilters.o
 
 %.pb.o: %.pb.cc
 	$(GCC) $^ $(WARNINGS) $(OPTIONS) $(FLAGS) -c -o $@

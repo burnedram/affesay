@@ -1,37 +1,9 @@
 #include <iserverplugin.h>
 #include <eiface.h>
 #include <iplayerinfo.h>
-#include <irecipientfilter.h>
 #include <tier1.h>
+#include "recipientfilters.h"
 #include "cstrike15_usermessages.pb.h"
-
-class ChatFilter : public IRecipientFilter
-{
-    private:
-        int recipient;
-    public:
-        ChatFilter(int rec)
-        {
-            recipient = rec;
-        }
-        virtual bool	IsReliable( void ) const
-        {
-            return true;
-        }
-        virtual bool	IsInitMessage( void ) const
-        {
-            return false;
-        }
-
-        virtual int		GetRecipientCount( void ) const
-        {
-            return 1;
-        }
-        virtual int		GetRecipientIndex( int slot ) const
-        {
-            return  recipient;
-        }
-};
 
 class ServerPluginCallbacks : public IServerPluginCallbacks
 {

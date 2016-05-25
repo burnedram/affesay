@@ -11,7 +11,9 @@ This plugin uses the AlliedModders CSGO SDK [mirror](https://githu mirrorb.com/a
 
 ## protoc
 A copy of the protobuf 2.5.0 source code is provided with the AlliedModders mirror, located in  
-`hl2sdk-csgo/common/protobuf-2.5.0/src`
+`hl2sdk-csgo/common/protobuf-2.5.0/src`  
+But it seems to be missing some key compilation components (`autogen.sh`, `configure`),  
+so download it from [source](https://github.com/google/protobuf/releases/tag/v2.5.0) instead
 
 You can follow the official installation [guide](https://github.com/google/protobuf/tree/master/src#c-installation---unix), unless you're using a 64-bit distro, and want to run this 32-bit plugin on it. By default it will compile it as a 64-bit program and library, which can't be loaded into `srcds_linux`
 

@@ -2,9 +2,15 @@
 #include <eiface.h>
 #include <iplayerinfo.h>
 #include <tier1.h>
+#include <convar.h>
 #include "recipientfilters.h"
 #include "cstrike15_usermessages.pb.h"
 
+ConVar myVar("myVar", "42", FCVAR_REPLICATED | FCVAR_NOTIFY, "A number...");
+void MyFun() {
+    Msg("HELLO FROM THE OUTSIIIIIIIDEEEEEEEE\n");
+}
+ConCommand myComm("myComm", MyFun, "Theo pizza pls", 0);
 class ServerPluginCallbacks : public IServerPluginCallbacks
 {
     private:
@@ -24,6 +30,8 @@ class ServerPluginCallbacks : public IServerPluginCallbacks
         icvar = (ICvar *) interfaceFactory(CVAR_INTERFACE_VERSION, NULL);
         if(!icvar)
             ConMsg("No icvar\n");
+        icvar->RegisterConCommand(&myVar);
+        icvar->RegisterConCommand(&myComm);
         playerinfomanager = (IPlayerInfoManager *) gameServerFactory(INTERFACEVERSION_PLAYERINFOMANAGER, NULL);
         if(!playerinfomanager)
             ConMsg("No playerinfomanager\n");

@@ -6,18 +6,77 @@
 #include "recipientfilters.h"
 #include "cstrike15_usermessages.pb.h"
 
+#define ENTINDEX(pEdict) pEdict - globals->pEdicts
+
+IVEngineServer *engine = NULL;
+ICvar *icvar = NULL;
+IPlayerInfoManager *playerinfomanager = NULL;
+CGlobalVars *globals = NULL;
+int maxPlayers = 0;
+
 ConVar myVar("myVar", "42", FCVAR_REPLICATED | FCVAR_NOTIFY, "A number...");
 void MyFun() {
     Msg("HELLO FROM THE OUTSIIIIIIIDEEEEEEEE\n");
+    for(int i = 1; i <= maxPlayers; i++) {
+        IPlayerInfo *info = playerinfomanager->GetPlayerInfo(globals->pEdicts + i);
+        if(info)
+            Msg("Player %d %s %s\n", i, info->GetName(), info->GetNetworkIDString());
+    }
 }
 ConCommand myComm("myComm", MyFun, "Theo pizza pls", 0);
+
+// Sends pszMessage to the first user that has the name pszName
+void SayName(const char *pszName, const char *pszMessage) {
+    RecipientFilter filter(1);
+    for(int i = 1; i <= maxPlayers; i++) {
+        IPlayerInfo *info = playerinfomanager->GetPlayerInfo(globals->pEdicts + i);
+        if(info && !strcmp(info->GetName(), pszName)) {
+            filter.AddRecipient(i);
+            break;
+        }
+    }
+    filter.MakeReliable();
+    if(!filter.GetRecipientCount()) {
+        ConMsg("no user with that name\n");
+        return;
+    }
+
+    CCSUsrMsg_SayText msg;
+    msg.set_text(pszMessage);
+    msg.set_chat(true);
+    engine->SendUserMessage(filter, CS_UM_SayText, msg);
+
+    /*
+    // Send the same message but in rainbow colors. Sends weird chars for long strings
+    char pszColored[strlen(pszMessage) * 2 + 1];
+    for(unsigned int i = 0, j = 0; i < strlen(pszMessage);) {
+        pszColored[j++] = i+1;
+        pszColored[j++] = pszMessage[i++];
+    }
+    pszColored[strlen(pszMessage) * 2] = 0;
+
+    CCSUsrMsg_SayText msg2;
+    msg2.set_text(pszColored);
+    msg.set_chat(true);
+    engine->SendUserMessage(filter, CS_UM_SayText, msg2);
+    */
+}
+void cc_SayName(const CCommand &args) {
+    if(args.ArgC() < 3) {
+        ConMsg("Usage: affesay_name NAME MESSAGE\n");
+        return;
+    }
+    const char *pszName = args.Arg(1);
+    const char *pszMessage = args.ArgS();
+    // This doesn't feel right, but since we should never worry about
+    // deleting the string this shouldn't be a problem
+    pszMessage += strlen(pszName) + 1; // + 1 for whitespace
+    SayName(pszName, pszMessage);
+}
+ConCommand affesay_name("affesay_name", cc_SayName, "Send a chat message to a player with a particular name", FCVAR_SERVER_CAN_EXECUTE);
+
 class ServerPluginCallbacks : public IServerPluginCallbacks
 {
-    private:
-        IVEngineServer *engine = NULL;
-        ICvar *icvar = NULL;
-        IPlayerInfoManager *playerinfomanager = NULL;
-        CGlobalVars *globals = NULL;
     public:
 	// Initialize the plugin to run
 	// Return false if there is an error during startup.
@@ -32,6 +91,7 @@ class ServerPluginCallbacks : public IServerPluginCallbacks
             ConMsg("No icvar\n");
         icvar->RegisterConCommand(&myVar);
         icvar->RegisterConCommand(&myComm);
+        icvar->RegisterConCommand(&affesay_name);
         playerinfomanager = (IPlayerInfoManager *) gameServerFactory(INTERFACEVERSION_PLAYERINFOMANAGER, NULL);
         if(!playerinfomanager)
             ConMsg("No playerinfomanager\n");
@@ -68,6 +128,7 @@ class ServerPluginCallbacks : public IServerPluginCallbacks
 	// The server is about to activate
 	virtual void			ServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
     {
+        maxPlayers = clientMax;
     }
 
 	// The server should run physics/think on all edicts

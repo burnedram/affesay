@@ -6,19 +6,20 @@
 #include "recipientfilters.h"
 #include "cstrike15_usermessages.pb.h"
 
-#define ENTINDEX(pEdict) pEdict - globals->pEdicts
+#define ENTINDEX(pEdict) pEdict - pGlobals->pEdicts
 
-IVEngineServer *engine = NULL;
-ICvar *icvar = NULL;
-IPlayerInfoManager *playerinfomanager = NULL;
-CGlobalVars *globals = NULL;
+IVEngineServer *pEngine = NULL;
+// We get g_pCVar from tier1.h
+//extern ICvar *g_pCVar;
+IPlayerInfoManager *pPlayerInfoManager = NULL;
+CGlobalVars *pGlobals = NULL;
 int maxPlayers = 0;
 
 ConVar myVar("myVar", "42", FCVAR_REPLICATED | FCVAR_NOTIFY, "A number...");
 void MyFun() {
     Msg("HELLO FROM THE OUTSIIIIIIIDEEEEEEEE\n");
     for(int i = 1; i <= maxPlayers; i++) {
-        IPlayerInfo *info = playerinfomanager->GetPlayerInfo(globals->pEdicts + i);
+        IPlayerInfo *info = pPlayerInfoManager->GetPlayerInfo(pGlobals->pEdicts + i);
         if(info)
             Msg("Player %d %s %s\n", i, info->GetName(), info->GetNetworkIDString());
     }
@@ -29,7 +30,7 @@ ConCommand myComm("myComm", MyFun, "Theo pizza pls", 0);
 void SayName(const char *pszName, const char *pszMessage) {
     RecipientFilter filter(1);
     for(int i = 1; i <= maxPlayers; i++) {
-        IPlayerInfo *info = playerinfomanager->GetPlayerInfo(globals->pEdicts + i);
+        IPlayerInfo *info = pPlayerInfoManager->GetPlayerInfo(pGlobals->pEdicts + i);
         if(info && !strcmp(info->GetName(), pszName)) {
             filter.AddRecipient(i);
             break;
@@ -44,7 +45,7 @@ void SayName(const char *pszName, const char *pszMessage) {
     CCSUsrMsg_SayText msg;
     msg.set_text(pszMessage);
     msg.set_chat(true);
-    engine->SendUserMessage(filter, CS_UM_SayText, msg);
+    pEngine->SendUserMessage(filter, CS_UM_SayText, msg);
 
     /*
     // Send the same message but in rainbow colors. Sends weird chars for long strings
@@ -58,7 +59,7 @@ void SayName(const char *pszName, const char *pszMessage) {
     CCSUsrMsg_SayText msg2;
     msg2.set_text(pszColored);
     msg.set_chat(true);
-    engine->SendUserMessage(filter, CS_UM_SayText, msg2);
+    pEngine->SendUserMessage(filter, CS_UM_SayText, msg2);
     */
 }
 void cc_SayName(const CCommand &args) {
@@ -82,20 +83,22 @@ class ServerPluginCallbacks : public IServerPluginCallbacks
 	// Return false if there is an error during startup.
     virtual bool Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory)
     {
+        //g_pCVar = (ICvar *) interfaceFactory(CVAR_INTERFACE_VERSION, NULL);
         ConnectTier1Libraries(&interfaceFactory, 1);
-        engine = (IVEngineServer *) interfaceFactory(INTERFACEVERSION_VENGINESERVER, NULL);
-        if(!engine)
+        if(!g_pCVar) {
+            ConMsg("%s: [ERROR] No ICvar\n", GetPluginDescription());
+            return false;
+        }
+        pEngine = (IVEngineServer *) interfaceFactory(INTERFACEVERSION_VENGINESERVER, NULL);
+        if(!pEngine)
             ConMsg("No engine\n");
-        icvar = (ICvar *) interfaceFactory(CVAR_INTERFACE_VERSION, NULL);
-        if(!icvar)
-            ConMsg("No icvar\n");
-        icvar->RegisterConCommand(&myVar);
-        icvar->RegisterConCommand(&myComm);
-        icvar->RegisterConCommand(&affesay_name);
-        playerinfomanager = (IPlayerInfoManager *) gameServerFactory(INTERFACEVERSION_PLAYERINFOMANAGER, NULL);
-        if(!playerinfomanager)
+        pPlayerInfoManager = (IPlayerInfoManager *) gameServerFactory(INTERFACEVERSION_PLAYERINFOMANAGER, NULL);
+        if(!pPlayerInfoManager)
             ConMsg("No playerinfomanager\n");
-        globals = playerinfomanager->GetGlobalVars();
+        pGlobals = pPlayerInfoManager->GetGlobalVars();
+        g_pCVar->RegisterConCommand(&myVar);
+        g_pCVar->RegisterConCommand(&myComm);
+        g_pCVar->RegisterConCommand(&affesay_name);
         return true;
     }
 
@@ -181,7 +184,7 @@ class ServerPluginCallbacks : public IServerPluginCallbacks
 	// The client has typed a command at the console
 	virtual PLUGIN_RESULT	ClientCommand( edict_t *pEdict, const CCommand &args )
     {
-        int entindex = pEdict - globals->pEdicts;
+        int entindex = pEdict - pGlobals->pEdicts;
         CCSUsrMsg_SayText msg;
         ChatFilter filter(entindex);
 
@@ -190,9 +193,9 @@ class ServerPluginCallbacks : public IServerPluginCallbacks
                 ConMsg("SENDING STUFF\n");
                 msg.set_text("t\x01je\x02n\x03na");
                 msg.set_chat(true);
-                engine->SendUserMessage(filter, CS_UM_SayText, msg);
+                pEngine->SendUserMessage(filter, CS_UM_SayText, msg);
         }
-        engine->ClientPrintf(pEdict, "T\x01j\x02e\x03n\x03n\x04a\a");
+        pEngine->ClientPrintf(pEdict, "T\x01j\x02e\x03n\x03n\x04a\a");
         return PLUGIN_CONTINUE;
     }
 

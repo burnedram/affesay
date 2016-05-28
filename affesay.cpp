@@ -5,11 +5,11 @@
 
 ConVar myVar("myVar", "42", FCVAR_REPLICATED | FCVAR_NOTIFY, "A number...");
 void MyFun() {
-    g_Plugin.info("HELLO FROM THE OUTSIIIIIIIDEEEEEEEE");
+    DEBUG("HELLO FROM THE OUTSIIIIIIIDEEEEEEEE");
     for(int i = 1; i <= g_iMaxPlayers; i++) {
         IPlayerInfo *info = g_pPlayerInfoManager->GetPlayerInfo(g_pGlobals->pEdicts + i);
         if(info)
-            ConMsg("\tPlayer %d %s %s\n", i, info->GetName(), info->GetNetworkIDString());
+            DEBUG("\tPlayer %d %s %s\n", i, info->GetName(), info->GetNetworkIDString());
     }
 }
 ConCommand myComm("myComm", MyFun, "Theo pizza pls", 0);

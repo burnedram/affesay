@@ -7,15 +7,16 @@
 #include <tier1.h>
 
 #define ENTINDEX(pEdict) pEdict - pGlobals->pEdicts
+#define LOG(level, format, ...) ConMsg("%s: [" level "] " format"\n", g_Plugin.GetPluginDescription(), ##__VA_ARGS__)
+#define INFO( format, ...) LOG("INFO",  format, ##__VA_ARGS__)
+#define DEBUG(format, ...) LOG("DEBUG", format, ##__VA_ARGS__)
+#define WARN( format, ...) LOG("WARN",  format, ##__VA_ARGS__)
+#define ERROR(format, ...) LOG("ERROR", format, ##__VA_ARGS__)
 
 class AffeSayPlugin : public IServerPluginCallbacks {
     public:
                                 AffeSayPlugin();
         virtual                 ~AffeSayPlugin();
-        void                    info(const char *pszMsg);
-        void                    debug(const char *pszMsg);
-        void                    warning(const char *pszMsg);
-        void                    error(const char *pszMsg);
 
         // IServerPluginCallbacks methods
         virtual bool            Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory );

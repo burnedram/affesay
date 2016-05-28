@@ -11,38 +11,32 @@ int g_iMaxPlayers = 0;
 AffeSayPlugin::AffeSayPlugin() {}
 AffeSayPlugin::~AffeSayPlugin() {}
 
-void AffeSayPlugin::info(const char *pszMsg) {
-    ConMsg("%s: [INFO]  %s\n", GetPluginDescription(), pszMsg);
-}
-
-void AffeSayPlugin::debug(const char *pszMsg) {
-    ConMsg("%s: [DEBUG] %s\n", GetPluginDescription(), pszMsg);
-}
-
-void AffeSayPlugin::warning(const char *pszMsg) {
-    ConMsg("%s: [WARN]  %s\n", GetPluginDescription(), pszMsg);
-}
-
-void AffeSayPlugin::error(const char *pszMsg) {
-    ConMsg("%s: [ERROR] %s\n", GetPluginDescription(), pszMsg);
-}
-
 // Initialize the plugin to run
 // Return false if there is an error during startup.
 bool AffeSayPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn gameServerFactory) {
     //g_pCVar = (ICvar *) interfaceFactory(CVAR_INTERFACE_VERSION, NULL);
     ConnectTier1Libraries(&interfaceFactory, 1);
     if(!g_pCVar) {
-        ConMsg("%s: [ERROR] No ICvar\n", GetPluginDescription());
+        ERROR("No ICvar");
         return false;
     }
     g_pEngine = (IVEngineServer *) interfaceFactory(INTERFACEVERSION_VENGINESERVER, NULL);
-    if(!g_pEngine)
-        ConMsg("No engine\n");
+    if(!g_pEngine) {
+        ERROR("No IVEngineServer");
+        return false;
+    }
     g_pPlayerInfoManager = (IPlayerInfoManager *) gameServerFactory(INTERFACEVERSION_PLAYERINFOMANAGER, NULL);
-    if(!g_pPlayerInfoManager)
-        ConMsg("No playerinfomanager\n");
+    if(!g_pPlayerInfoManager) {
+        ERROR("No IPlayerInfoManager");
+        return false;
+    }
     g_pGlobals = g_pPlayerInfoManager->GetGlobalVars();
+    if(!g_pGlobals) {
+        ERROR("No CGlobalVars");
+        return false;
+    }
+
+    // Everything seems to be ok, we can run
     RegisterConCommands();
     return true;
 }
@@ -118,9 +112,9 @@ PLUGIN_RESULT AffeSayPlugin::ClientCommand(edict_t *pEdict, const CCommand &args
     CCSUsrMsg_SayText msg;
     ChatFilter filter(entindex);
 
-    ConMsg("COMMAND: %s///\n", args.GetCommandString());
+    DEBUG("COMMAND: %s///\n", args.GetCommandString());
     if(!strcasecmp("affe ", args.GetCommandString())) {
-        ConMsg("SENDING STUFF\n");
+        DEBUG("SENDING STUFF\n");
         msg.set_text("t\x01je\x02n\x03na");
         msg.set_chat(true);
         g_pEngine->SendUserMessage(filter, CS_UM_SayText, msg);

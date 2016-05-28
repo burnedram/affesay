@@ -64,4 +64,8 @@ void cc_SayName(const CCommand &args) {
 }
 ConCommand affesay_name("affesay_name", cc_SayName, "Send a chat message to a player with a particular name", FCVAR_SERVER_CAN_EXECUTE);
 
-const std::vector<ConCommandBase *> pCCs = {&myVar, &myComm, &affesay_name};
+void RegisterConCommands() {
+    g_pCVar->RegisterConCommand(&myVar);
+    g_pCVar->RegisterConCommand(&myComm);
+    g_pCVar->RegisterConCommand(&affesay_name);
+}

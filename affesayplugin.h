@@ -1,7 +1,6 @@
 #ifndef AFFESAYPLUGIN_H
 #define AFFESAYPLUGIN_H
 
-#include <vector>
 #include <iserverplugin.h>
 #include <eiface.h>
 #include <iplayerinfo.h>
@@ -50,6 +49,6 @@ extern IPlayerInfoManager *g_pPlayerInfoManager;
 extern CGlobalVars *g_pGlobals;
 extern int g_iMaxPlayers;
 
-extern const std::vector<ConCommandBase *> pCCs;
+extern void RegisterConCommands();
 
 #endif

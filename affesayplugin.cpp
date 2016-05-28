@@ -43,11 +43,7 @@ bool AffeSayPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn g
     if(!g_pPlayerInfoManager)
         ConMsg("No playerinfomanager\n");
     g_pGlobals = g_pPlayerInfoManager->GetGlobalVars();
-    for(ConCommandBase *pCC: pCCs)
-        g_pCVar->RegisterConCommand(pCC);
-    //g_pCVar->RegisterConCommand(&myVar);
-    //g_pCVar->RegisterConCommand(&myComm);
-    //g_pCVar->RegisterConCommand(&affesay_name);
+    RegisterConCommands();
     return true;
 }
 

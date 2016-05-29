@@ -2,6 +2,7 @@
 #include "affesayplugin.h"
 #include "recipientfilters.h"
 #include "cstrike15_usermessages.pb.h"
+#include "cplayerinfo.h"
 
 ConVar myVar("myVar", "42", FCVAR_REPLICATED | FCVAR_NOTIFY, "A number...");
 void MyFun() {
@@ -65,10 +66,9 @@ void cc_SayName(const CCommand &args) {
 ConCommand affesay_name("affesay_name", cc_SayName, "Send a chat message to a player with a particular name", FCVAR_SERVER_CAN_EXECUTE);
 
 void PlayersJSON() {
-    // TODO get assists. CPlayerInfo::GetAssistsCount()
     ConMsg("{\"players\":[\n");
     for(int i = 1; i <= g_iMaxPlayers; i++) {
-        IPlayerInfo *info = g_pPlayerInfoManager->GetPlayerInfo(g_pGlobals->pEdicts + i);
+        CPlayerInfo *info = (CPlayerInfo *)g_pPlayerInfoManager->GetPlayerInfo(g_pGlobals->pEdicts + i);
         if(!info || info->IsFakeClient())
             continue;
         ConMsg("  {\n");
@@ -78,6 +78,7 @@ void PlayersJSON() {
         ConMsg("    \"networkID\":"         "\"%s\",\n", info->GetNetworkIDString());
         ConMsg("    \"teamIndex\":"         "\"%d\",\n", info->GetTeamIndex());
         ConMsg("    \"fragCount\":"         "\"%d\",\n", info->GetFragCount());
+        ConMsg("    \"assistsCount\":"      "\"%d\",\n", info->GetAssistsCount());
         ConMsg("    \"deathCount\":"        "\"%d\",\n", info->GetDeathCount());
         ConMsg("    \"isConnected\":"       "\"%s\",\n", info->IsConnected() ? "true" : "false");
         ConMsg("    \"armor\":"             "\"%d\",\n", info->GetArmorValue());

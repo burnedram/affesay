@@ -16,7 +16,7 @@ all: affesay.so
 affesay.so: affesay.o affesayplugin.o recipientfilters.o netmessages.pb.o cstrike15_usermessages.pb.o libtier0.so hl2sdk-csgo/lib/linux/tier1_i486.a hl2sdk-csgo/lib/linux/interfaces_i486.a
 	$(GCC) $^ $(OPTIONS) -static-libgcc -lstdc++ $(shell pkg-config --cflags --libs protobuf) -shared -o affesay.so
 
-affesay.o: affesay.cpp affesayplugin.h recipientfilters.h cstrike15_usermessages.pb.h
+affesay.o: affesay.cpp affesayplugin.h recipientfilters.h cstrike15_usermessages.pb.h cplayerinfo.h
 	$(GCC) $< $(PLUGIN_FLAGS) -c -o $@
 
 %.pb.o: %.pb.cc %.pb.h

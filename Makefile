@@ -13,10 +13,19 @@ PLUGIN_FLAGS = $(WARNINGS) $(OPTIONS) $(FLAGS) $(EXTRA_FLAGS) $(DEFINES) $(INCLU
 
 all: affesay.so
 
-affesay.so: affesay.o affesayplugin.o recipientfilters.o netmessages.pb.o cstrike15_usermessages.pb.o libtier0.so libvstdlib.so hl2sdk-csgo/lib/linux/tier1_i486.a hl2sdk-csgo/lib/linux/interfaces_i486.a
+affesay.so: affesay.o affesayplugin.o recipientfilters.o ccsplayer.o reflection.o netmessages.pb.o cstrike15_usermessages.pb.o libtier0.so libvstdlib.so hl2sdk-csgo/lib/linux/tier1_i486.a hl2sdk-csgo/lib/linux/interfaces_i486.a
 	$(GCC) $^ $(OPTIONS) -static-libgcc -lstdc++ $(shell pkg-config --cflags --libs protobuf) -shared -o affesay.so
 
-affesay.o: affesay.cpp affesayplugin.h recipientfilters.h cstrike15_usermessages.pb.h cplayerinfo.h
+affesayplugin.o: affesayplugin.cpp affesayplugin.h reflection.h
+	$(GCC) $< $(PLUGIN_FLAGS) -c -o $@
+
+affesay.o: affesay.cpp affesayplugin.h recipientfilters.h cstrike15_usermessages.pb.h cplayerinfo.h ccsplayer.h
+	$(GCC) $< $(PLUGIN_FLAGS) -c -o $@
+
+ccsplayer.o: ccsplayer.cpp ccsplayer.h reflection.h
+	$(GCC) $< $(PLUGIN_FLAGS) -c -o $@
+
+reflection.o: reflection.cpp reflection.h affesayplugin.h
 	$(GCC) $< $(PLUGIN_FLAGS) -c -o $@
 
 %.pb.o: %.pb.cc %.pb.h

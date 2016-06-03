@@ -3,6 +3,7 @@
 #include "recipientfilters.h"
 #include "cstrike15_usermessages.pb.h"
 #include "cplayerinfo.h"
+#include "ccsplayer.h"
 
 ConVar myVar("myVar", "42", FCVAR_REPLICATED | FCVAR_NOTIFY, "A number...");
 void MyFun() {
@@ -154,9 +155,38 @@ void cc_PlayersJSON(const CCommand &args) {
 }
 ConCommand affesay_listids("affesay_players_json", cc_PlayersJSON, "Lists all players in JSON format", FCVAR_SERVER_CAN_EXECUTE);
 
+void fCCSPlayer(const char *pszName) {
+    int iEnt = -1;
+    for(int i = 1; i <= g_iMaxPlayers; i++) {
+        IPlayerInfo *info = g_pPlayerInfoManager->GetPlayerInfo(g_pGlobals->pEdicts + i);
+        if(info && !strcmp(info->GetName(), pszName)) {
+            iEnt = i;
+            break;
+        }
+    }
+    if(iEnt == -1) {
+        ConMsg("nu user with that name\n");
+        return;
+    }
+
+    if(!initReflection())
+        return;
+    CCSPlayer *pPlayerUtil = CCSPlayer::Instance(iEnt);
+    DEBUG("UTIL_PlayerByIndex(int) %p", pPlayerUtil);
+    DEBUG("CASH %d", pPlayerUtil->GetAccountBalance());
+    pPlayerUtil->SetHealth(69);
+    //pPlayerUtil->Blind(255, 255, 255);
+    DEBUG("CLANNAME %s", pPlayerUtil->GetClanName());
+}
+void cc_ccsplayer() {
+    fCCSPlayer("burnedram");
+}
+ConCommand ccsplayer("ccsplayer", cc_ccsplayer, "CCSPlayer test", FCVAR_SERVER_CAN_EXECUTE);
+
 void RegisterConCommands() {
     g_pCVar->RegisterConCommand(&myVar);
     g_pCVar->RegisterConCommand(&myComm);
     g_pCVar->RegisterConCommand(&affesay_name);
     g_pCVar->RegisterConCommand(&affesay_listids);
+    g_pCVar->RegisterConCommand(&ccsplayer);
 }

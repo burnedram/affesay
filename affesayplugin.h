@@ -5,6 +5,7 @@
 #include <eiface.h>
 #include <iplayerinfo.h>
 #include <tier1.h>
+#include <igameevents.h>
 
 #define ENTINDEX(pEdict) pEdict - pGlobals->pEdicts
 #define LOG(level, format, ...) ConMsg("%s: [" level "] " format"\n", g_Plugin.GetPluginDescription(), ##__VA_ARGS__)
@@ -48,6 +49,7 @@ extern AffeSayPlugin g_Plugin;
 extern IVEngineServer *g_pEngine;
 extern IPlayerInfoManager *g_pPlayerInfoManager;
 extern CGlobalVars *g_pGlobals;
+extern IGameEventManager *g_pGameEventManager;
 extern int g_iMaxPlayers;
 
 extern void RegisterConCommands();

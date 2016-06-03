@@ -6,7 +6,17 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(AffeSayPlugin, IServerPluginCallbacks, INTERFA
 IVEngineServer *g_pEngine = NULL;
 IPlayerInfoManager *g_pPlayerInfoManager = NULL;
 CGlobalVars *g_pGlobals = NULL;
+IGameEventManager *g_pGameEventManager = NULL;
 int g_iMaxPlayers = 0;
+
+class EventListener : public IGameEventListener {
+    public:
+        virtual ~EventListener(void) {};
+        virtual void FireGameEvent(KeyValues *event) {
+            DEBUG("EVENT: %s", event->GetName());
+        }
+};
+EventListener eventListener;
 
 AffeSayPlugin::AffeSayPlugin() {}
 AffeSayPlugin::~AffeSayPlugin() {}
@@ -35,6 +45,12 @@ bool AffeSayPlugin::Load(CreateInterfaceFn interfaceFactory, CreateInterfaceFn g
         ERROR("No CGlobalVars");
         return false;
     }
+    g_pGameEventManager = (IGameEventManager *) interfaceFactory(INTERFACEVERSION_GAMEEVENTSMANAGER, NULL);
+    if(!g_pGameEventManager) {
+        ERROR("No IGameEventManager");
+        return false;
+    }
+    g_pGameEventManager->AddListener(&eventListener, true);
 
     // Everything seems to be ok, we can run
     RegisterConCommands();

@@ -13,7 +13,7 @@ PLUGIN_FLAGS = $(WARNINGS) $(OPTIONS) $(FLAGS) $(EXTRA_FLAGS) $(DEFINES) $(INCLU
 
 all: affesay.so
 
-affesay.so: affesay.o affesayplugin.o recipientfilters.o netmessages.pb.o cstrike15_usermessages.pb.o libtier0.so hl2sdk-csgo/lib/linux/tier1_i486.a hl2sdk-csgo/lib/linux/interfaces_i486.a
+affesay.so: affesay.o affesayplugin.o recipientfilters.o netmessages.pb.o cstrike15_usermessages.pb.o libtier0.so libvstdlib.so hl2sdk-csgo/lib/linux/tier1_i486.a hl2sdk-csgo/lib/linux/interfaces_i486.a
 	$(GCC) $^ $(OPTIONS) -static-libgcc -lstdc++ $(shell pkg-config --cflags --libs protobuf) -shared -o affesay.so
 
 affesay.o: affesay.cpp affesayplugin.h recipientfilters.h cstrike15_usermessages.pb.h cplayerinfo.h
@@ -32,6 +32,9 @@ cstrike15_usermessages.pb.h cstrike15_usermessages.pb.cc: cstrike15_usermessages
 	protoc --proto_path=. --proto_path=/usr/include --cpp_out=. $<
 
 libtier0.so: hl2sdk-csgo/lib/linux/libtier0.so
+	cp $^ $@
+
+libvstdlib.so: hl2sdk-csgo/lib/linux/libvstdlib.so
 	cp $^ $@
 
 netmessages.proto: hl2sdk-csgo/public/engine/protobuf/netmessages.proto

@@ -17,7 +17,13 @@ so download it from [source](https://github.com/google/protobuf/releases/tag/v2.
 
 You can follow the official installation [guide](https://github.com/google/protobuf/tree/master/src#c-installation---unix), unless you're using a 64-bit distro, and want to run this 32-bit plugin on it. By default it will compile it as a 64-bit program and library, which can't be loaded into `srcds_linux`
 
-To fix this run `CC="gcc -m32" CXX=g++ -m32" ./configure` instead of just `./configure`.  
+To fix this run:
+```
+./configure --build=i686-pc-linux-gnu
+            --host=x86_64-pc-linux-gnu 
+            "CFLAGS=-m32" "CXXFLAGS=-m32" "LDFLAGS=-m32"
+```
+instead of just `./configure`.  
 Also, it will probably help to add `--prefix=/usr` as mentioned in the guide
 
 ## Actually compiling the plugin

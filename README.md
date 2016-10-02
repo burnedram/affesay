@@ -19,8 +19,8 @@ You can follow the official installation [guide](https://github.com/google/proto
 
 To fix this run:
 ```
-./configure --build=i686-pc-linux-gnu
-            --host=x86_64-pc-linux-gnu 
+./configure --build=i686-pc-linux-gnu \
+            --host=x86_64-pc-linux-gnu \
             "CFLAGS=-m32" "CXXFLAGS=-m32" "LDFLAGS=-m32"
 ```
 instead of just `./configure`.  

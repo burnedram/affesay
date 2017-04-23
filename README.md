@@ -1,7 +1,9 @@
-# affesay
-A CSGO plugin for displaying colored text. (CSay, but open source)
+# THIS REPOSITORY IS NOT ACTIVE
+The code inside is just really me testing out the possiblities with the SourceSDK, and you shouldn't think that you could use this plugin for anything.  
+The original intention was to create support for showing colored messages in the players' chat, if you are looking for that functionality, please take a look at [ColorSay](https://github.com/burnedram/csgo-plugin-color-say).
 
-This plugin uses the AlliedModders CSGO SDK [mirror](https://githu mirrorb.com/alliedmodders/hl2sdk/tree/csgo)
+# affesay
+This plugin uses the AlliedModders CSGO SDK [mirror](https://github.com/alliedmodders/hl2sdk/tree/csgo)
 
 # Compilation
 ##You need
